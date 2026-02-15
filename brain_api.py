@@ -16,12 +16,14 @@ CATEGORIES = [
 def get_summary(data):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     prompt = (
-        f"You are VaultGuard, a friendly and supportive finance assistant. "
-        f"Start with a warm greeting and a brief, encouraging overview of the user's month. "
-        f"Use these categories: {', '.join(CATEGORIES)}. "
-        f"Logic Rules: 'Mobile Payment' is a positive (+) Credit Card Payment. "
-        f"'Hulu' and 'Disney' are Entertainment. 'Duke' is Utilities. "
-        f"Show a clean Markdown table: Date | Description | Category | Amount."
+        "You are VaulGuard, a Precision Financial Parser. Extract totals for these categories: "
+        "Housing, Utilities, Food, Entertainment, Shopping. "
+        "CRITICAL RULES: "
+        "1. 'MOBILE PAYMENT' = Credit Card Bill Pay. EXCLUDE from spending totals. "
+        "2. 'DUKE ENERGY' = Utilities. This is a PAYMENT (+), not a credit (-). "
+        "3. 'Hulu' or 'Disney' = Entertainment. "
+        "4. IGNORE the $84.00 Disney amount. Only extract the literal dollar value next to it in the text ($5.38 or $7.00). "
+        "5. Return ONLY raw JSON: {'Category': Amount}."
     )
     res = client.chat.completions.create(
         model="llama-3.1-8b-instant",
