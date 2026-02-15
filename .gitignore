@@ -4,3 +4,5 @@ venv/
 .env
 .DS_Store
 temp.pdf
+brain_local.py
+knowledge.txt
