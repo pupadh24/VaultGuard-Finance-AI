@@ -13,16 +13,16 @@ CATEGORIES = [
     "Other"
 ]
 
-def get_summary(data):
+def get_summary(data, chart_json):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     prompt = (
         f"You are VaultGuard, a friendly finance AI. "
-        f"Start with a warm greeting. "
-        f"Summarize the spending warmly and use these categories: {', '.join(CATEGORIES)}. "
-        f"Logic Rules: 'Mobile Payment' is a positive (+) Credit Card Payment. "
-        f"'Hulu' and 'Disney' are Entertainment. 'Duke' is Utilities & Bills. "
-        f"Show a clean Markdown table: Date | Description | Category | Amount."
+        f"Here is the CORRECT spending data for this month: {chart_json}. "
+        f"USE THESE NUMBERS ONLY. Do not invent new totals. "
+        f"Give a warm greeting and summarize the spending based on these totals. "
+        f"Include a Markdown table of the Top 3 spending categories."
     )
+    
     res = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[{"role": "system", "content": prompt}, {"role": "user", "content": data}]
