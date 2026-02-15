@@ -6,6 +6,13 @@ def chat(data):
         summary = brain_api.get_summary(data)
         chart_json = brain_api.get_chart_data(data)
         return f"{summary} ||| {chart_json}"
+    
     else:
-        import brain_local
-        return brain_local.chat(data)
+        try:
+            import brain_local
+            return brain_local.chat(data)
+        except ModuleNotFoundError:
+            import brain_api
+            summary = brain_api.get_summary(data)
+            chart_json = brain_api.get_chart_data(data)
+            return f"{summary} ||| {chart_json}"
