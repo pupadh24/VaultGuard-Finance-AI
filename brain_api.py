@@ -1,12 +1,25 @@
 import os
 from groq import Groq
 
+CATEGORIES = [
+    "Housing & Rent", 
+    "Utilities & Bills", 
+    "Food & Dining", 
+    "Transportation", 
+    "Shopping", 
+    "Entertainment", 
+    "Credit Card Payment", 
+    "Income & Refunds", 
+    "Other"
+]
+
 def get_summary(data):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     prompt = (
-        "You are VaultGuard, a friendly finance AI "
-        "Summarize the user's spending warmly and provide a Markdown table of the Top 3 transactions "
-        "Rule: Positive numbers = Spending, Negative = Credits. Do not output JSON"
+        f"You are VaultGuard Finance AI. Summarize the spending. "
+        f"Classify transactions into these categories: {', '.join(CATEGORIES)}. "
+        f"Note: 'Mobile Payment' is a Credit Card Payment. 'Duke' is Utilities. "
+        f"Show a Markdown table of all transactions with Date, Description, Category, and Amount."
     )
     res = client.chat.completions.create(
         model="llama-3.1-8b-instant",
@@ -17,9 +30,10 @@ def get_summary(data):
 def get_chart_data(data):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     prompt = (
-        "You are a data extractor. Extract categories and totals from these transactions "
-        "Return ONLY a JSON object. Example: {'Rent': 1200, 'Groceries': 150} "
-        "Rule: Spent = Positive, Credits = Negative. Only use the final number per line"
+        f"Act as a data processor. Group all transactions into these categories: {', '.join(CATEGORIES)}. "
+        f"Return ONLY a JSON object where keys are category names and values are totals. "
+        f"Exclude 'Credit Card Payment' from the totals. "
+        f"Ensure all values are positive numbers."
     )
     res = client.chat.completions.create(
         model="llama-3.1-8b-instant",
