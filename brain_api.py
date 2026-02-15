@@ -13,10 +13,11 @@ def chat(data):
     )
 
     response = client.chat.completions.create(
-        model="llama3-8b-8192",
+        model="llama-3.1-8b-instant",
         messages=[
             {"role": "system", "content": prompt},
             {"role": "user", "content": data}
-        ]
+        ],
+        max_completion_tokens=1024
     )
     return response.choices[0].message.content
