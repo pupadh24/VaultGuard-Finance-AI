@@ -16,10 +16,12 @@ CATEGORIES = [
 def get_summary(data):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     prompt = (
-        f"You are VaultGuard Finance AI. Summarize the spending. "
-        f"Classify transactions into these categories: {', '.join(CATEGORIES)}. "
-        f"Note: 'Mobile Payment' is a Credit Card Payment. 'Duke' is Utilities. "
-        f"Show a Markdown table of all transactions with Date, Description, Category, and Amount."
+        f"You are VaultGuard, a friendly and supportive finance assistant. "
+        f"Start with a warm greeting and a brief, encouraging overview of the user's month. "
+        f"Use these categories: {', '.join(CATEGORIES)}. "
+        f"Logic Rules: 'Mobile Payment' is a positive (+) Credit Card Payment. "
+        f"'Hulu' and 'Disney' are Entertainment. 'Duke' is Utilities. "
+        f"Show a clean Markdown table: Date | Description | Category | Amount."
     )
     res = client.chat.completions.create(
         model="llama-3.1-8b-instant",
@@ -30,10 +32,12 @@ def get_summary(data):
 def get_chart_data(data):
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
     prompt = (
-        f"Act as a data processor. Group all transactions into these categories: {', '.join(CATEGORIES)}. "
-        f"Return ONLY a JSON object where keys are category names and values are totals. "
-        f"Exclude 'Credit Card Payment' from the totals. "
-        f"Ensure all values are positive numbers."
+        f"Extract totals for: {', '.join(CATEGORIES)}. "
+        f"Rules: 'Disney' and 'Hulu' are Entertainment. 'Duke' is Utilities. "
+        f"Ignore 'Credit Card Payment' from pie chart totals. "
+        f"The 'Disney $84' credit is actually a small recurring $5.38 or $7.00 amount; "
+        f"only extract the actual numeric value found in the text. "
+        f"Return ONLY JSON: {{'Category': Total}}."
     )
     res = client.chat.completions.create(
         model="llama-3.1-8b-instant",

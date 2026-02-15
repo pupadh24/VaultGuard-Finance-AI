@@ -26,7 +26,7 @@ if file:
         f.write(file.getbuffer())
 
     if st.button("Analyze Statement"):
-        with st.spinner("Analyzing..."):
+        with st.spinner("VaultGuard is analyzing your spending..."):
             raw_text = cleaner.clean("temp.pdf")
             response = brain.chat(raw_text)
             
@@ -38,12 +38,12 @@ if file:
 
         col1, col2, col3 = st.columns(3)
         col1.metric("Privacy Shield", "Active")
-        col2.metric("Inference", "Groq Llama 3.1")
+        col2.metric("Inference", "Llama 3.1")
         col3.metric("Mode", "Production")
 
         st.divider()
 
-        tab1, tab2 = st.tabs(["📝 Transaction List", "📈 Spending Pie Chart"])
+        tab1, tab2 = st.tabs(["📝 Friendly Analysis", "📈 Spending Pie Chart"])
         
         with tab1:
             st.markdown(summary)
@@ -54,12 +54,12 @@ if file:
                 if data_dict:
                     df = pd.DataFrame(list(data_dict.items()), columns=['Category', 'Amount'])
                     df = df[df['Amount'] > 0]
-                    fig = px.pie(df, values='Amount', names='Category', hole=0.4,
-                                 color_discrete_sequence=px.colors.qualitative.Pastel)
+                    fig = px.pie(df, values='Amount', names='Category', hole=0.5,
+                                 color_discrete_sequence=px.colors.qualitative.Safe)
                     st.plotly_chart(fig, use_container_width=True)
                 else:
-                    st.info("No data available.")
+                    st.info("No spending data found for chart.")
             except:
-                st.error("Chart Error.")
+                st.error("Visualization Error.")
 
         st.success("Analysis Complete.")
