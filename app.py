@@ -1,66 +1,62 @@
-
 import streamlit as st
 import pandas as pd
+import json
 import cleaner
 import brain
-import json
-import re
-import plotly.express as px
 
-st.set_page_config(page_title="VaultGuard")
+st.set_page_config(page_title="VaultGuard", page_icon="🛡️")
 
-hide_style = """
-    <style>
-    #MainMenu, footer, header {visibility: hidden;}
-    </style>
-    """
-st.markdown(hide_style, unsafe_allow_html=True)
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.title("VaultGuard")
+st.title("🛡️ VaultGuard Finance AI")
+st.caption("Your Secure Privacy-First Financial Analysis")
 
-pdf_file = st.file_uploader("Upload PDF", type="pdf")
+file = st.file_uploader("Upload your bank statement (PDF)", type="pdf")
 
-if pdf_file:
+if file:
     with open("temp.pdf", "wb") as f:
-        f.write(pdf_file.getbuffer())
+        f.write(file.getbuffer())
 
-    if st.button("Analyze"):
-        with st.spinner("Processing..."):
+    if st.button("Analyze Statement"):
+        with st.spinner("VaultGuard is auditing your data safely..."):
             raw_text = cleaner.clean("temp.pdf")
-            result = brain.chat(raw_text)
+            response = brain.chat(raw_text)
             
-        st.subheader("Monthly Overview")
-        c1, c2, c3 = st.columns(3)
-        c1.metric("Privacy", "Active", "Safe")
-        c2.metric("Security", "Local", "Verified")
-        c3.metric("Shield", "Active", "100%")
+            try:
+                summary, chart_json = response.split("|||")
+            except ValueError:
+                summary = response
+                chart_json = "{}"
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Privacy Shield", "Active")
+        col2.metric("Analysis", "Llama 3.1")
+        col3.metric("Data Source", "Local PDF")
 
         st.divider()
 
-        t1, t2 = st.tabs(["📊 Analysis", "📈 Spending Chart"])
+        tab1, tab2 = st.tabs(["📝 Summary & Table", "📈 Spending Breakdown"])
         
-        with t1:
-            text_part = result.split("CHART_DATA:")[0]
-            st.markdown(text_part)
-
-        with t2:
+        with tab1:
+            st.markdown(summary)
+            
+        with tab2:
             try:
-                found = re.search(r"CHART_DATA:\s*(\[.*\])", result, re.DOTALL)
-                if found:
-                    data = json.loads(found.group(1))
-                    if data:
-                        df = pd.DataFrame(data)
-                        
-                        grouped = df.groupby('Category')['Amount'].sum().reset_index()
-                        chart = px.pie(grouped, values='Amount', names='Category', title='Spending by Category')
-                        st.plotly_chart(chart, use_container_width=True)
-                        
-                        st.divider()
-                        st.subheader("Transaction Details")
-                        st.dataframe(df, use_container_width=True)
-                    else:
-                        st.info("No data found")
+                data_dict = json.loads(chart_json.strip())
+                if data_dict:
+                    df = pd.DataFrame(list(data_dict.items()), columns=['Category', 'Amount'])
+                    df = df.sort_values(by="Amount", ascending=False)
+                    st.bar_chart(df.set_index("Category"))
                 else:
-                    st.error("Could not find chart data")
+                    st.info("No transaction data found to visualize.")
             except Exception as e:
-                st.warning(f"Error making chart: {str(e)}")
+                st.error("Visualization Error.")
+
+        st.success("Analysis Complete.")

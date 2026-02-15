@@ -3,11 +3,9 @@ import os
 def chat(data):
     if os.environ.get("STREAMLIT_CLOUD"):
         import brain_api
-        return brain_api.chat(data)
+        summary = brain_api.get_summary(data)
+        chart_json = brain_api.get_chart_data(data)
+        return f"{summary} ||| {chart_json}"
     else:
-        try:
-            import brain_local
-            return brain_local.chat(data)
-        except ImportError:
-            import brain_api
-            return brain_api.chat(data)
+        import brain_local
+        return brain_local.chat(data)
