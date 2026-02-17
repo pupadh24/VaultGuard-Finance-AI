@@ -1,4 +1,5 @@
 # VaultGuard Finance AI
+[Live Demo](https://vaultguard-finance-ai-pupadh24.streamlit.app/)
 
 This is a personal finance tool I'm building to help people look at their spending without worrying about their privacy. Most AI apps make you send your bank info to their servers. This project is unique since it'd let the AI work directly on your own computer so your data stays with you.
 
